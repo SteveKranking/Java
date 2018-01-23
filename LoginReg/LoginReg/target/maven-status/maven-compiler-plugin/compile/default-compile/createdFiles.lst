@@ -1,2 +1,3 @@
+com\codingdojo\nrampton\login\validator\UserValidator.class
+com\codingdojo\nrampton\login\services\UserDetailsServiceImplementation.class
 com\project\LoginReg\LoginRegApplication.class
-com\project\LoginReg\controllers\Router.class

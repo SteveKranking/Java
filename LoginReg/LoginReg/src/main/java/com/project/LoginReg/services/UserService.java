@@ -11,36 +11,45 @@ import com.project.LoginReg.repositories.UserRepository;
 
 @Service
 public class UserService {
-	private UserRepository userRepository;
-	private BCryptPasswordEncoder bcrypt;
-	// Member variables / service initializations go here
+
+	private UserRepository _ur;
+	private BCryptPasswordEncoder _bcrypt;
 		
-	public UserService(UserRepository userRepository){
-		this.userRepository=userRepository;
-		this.bcrypt=new BCryptPasswordEncoder();
+	public UserService(UserRepository _ur){
+		this._ur = _ur;
+		this._bcrypt = new BCryptPasswordEncoder();
 	}
 
-	public void create(User user) {
-		userRepository.save(user);
+	public boolean isMatch(String password, String dbPass) {
+		if (_bcrypt.matches(password, dbPass)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void createUser(User user) {
+		user.setPassword( _bcrypt.encode(user.getPassword()));
+		_ur.save(user);
 	}
 
-	public ArrayList<User> all() {
-		return (ArrayList<User>)userRepository.findAll();
+	public ArrayList<User> getAllUsers() {
+		return (ArrayList<User>) _ur.findAll();
 	}
 
-	public void update(User user) {
-		create(user);
+	public User findUserById(Long id) {
+		return (User) _ur.findOne(id);
 	}
 
-	public User findById(long id) {
-		return (User) userRepository.findOne(id);
+	public User findUserByEmail(String email) {
+		return (User) _ur.findByEmail(email);
+	}
+
+	public void updateUser(User user) {
+		createUser(user);
 	}
 
 	public void destroy(User user) {
-		userRepository.delete(user);
+		_ur.delete(user);
 	}
-
-
-	
-	// Crud methods to act on services go here.
 }

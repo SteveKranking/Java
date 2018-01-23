@@ -10,10 +10,5 @@ import com.project.LoginReg.models.User;
 
 @Repository 												
 public interface UserRepository extends CrudRepository<User,Long>{
-	// Query methods go here.
-	
-	// Example:
-	// public YourModelHere findByName(String name);
-
 	User findByEmail(String email);
 }

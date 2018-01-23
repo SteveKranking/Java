@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,32 +20,62 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.project.LoginReg.models.User;
-import com.project.LoginReg.repositories.UserRepository;
 import com.project.LoginReg.services.UserService;
 
 @Controller
 public class UserController{
-	//Member variables go here
-	private UserService us;
+	private UserService _us;
+	private BCryptPasswordEncoder _bcrypt;
 
-	public UserController(UserService us){
-		this.us=us;
+	public UserController(UserService _us) {
+		this._us = _us;		
+		this._bcrypt = new BCryptPasswordEncoder();
 	}
 	
 	@RequestMapping("/register")
-	public String register(@ModelAttribute("user") User user){
+	public String register(Model model, @ModelAttribute("user") User user, HttpSession session) {
+		session.invalidate();
 		return "register";
 	}	
 
 	@PostMapping("/register")
-	public String create(@Valid @ModelAttribute("user") User user, BindingResult res, HttpSession session) {
-		if(res.hasErrors()) {
+	public String createUser(@Valid @ModelAttribute("user") User user, BindingResult result, HttpSession session) {
+		if (result.hasErrors()) {
 			return "register";
+		} else {
+			_us.createUser(user);
+			session.setAttribute("id", user.getId());
+			return "redirect:/dashboard";
 		}
-		else {
-			us.create(user);
-			session.addAttribute("id", user.getId());
-			return "redirect:/";
+	}
+
+	@RequestMapping("/dashboard")
+	public String showDashboard(HttpSession session) {
+		if (session.getAttribute("id") != null) {
+			return "dashboard";			
+		} else {
+			return "redirect:/register";
+		}
+	}
+
+	@RequestMapping("/logout")
+	public String logout(HttpSession session) {
+		session.setAttribute("id", null);
+		return "redirect:/register";
+	}
+
+	@PostMapping("/login")
+	public String login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password) {
+		User user = _us.findUserByEmail(email);
+		if (user == null) {
+			return "redirect:/registration";
+		} else {
+			if (_us.isMatch(password, user.getPassword())) {
+				session.setAttribute("id", user.getId());
+				return "redirect:/dashboard";
+			} else {
+				return "redirect:/register";
+			}
 		}
 	}
 }

@@ -16,7 +16,6 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
-import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Email;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +25,17 @@ public class User{
 	@Id
 	@GeneratedValue
 	private long id;
+	@Size(min=1, message="First name cannot be blank")
+	private String firstName;
+	@Size(min=1, message="Last name cannot be blank")
+	private String lastName;
+	@Email(message="Invalid email format! example: example@example.com")
+	private String email;
+	private boolean admin;
+	@Size(min=8, message="Password must be at least eight characters")
+	private String password;
+	@Transient
+	private String confirm;
 
 	// Member variables and annotations go here.
 	
@@ -39,27 +49,6 @@ public class User{
 	public void onCreate(){this.createdAt = new Date();}
 	@PreUpdate
 	public void onUpdate(){this.updatedAt = new Date();}
-
-	@Email(message="Invalid email format: --@blank.com")
-	private String email;
-
-	private boolean admin;
-
-	
-	@Size(min=1, max=255, message="Name must be between 1-255 characters")
-	private String firstName;
-
-	@Size(min=1, max=255, message="Name must be between 1-255 characters")
-	private String lastName;
-
-	
-	@Size(min=8, max=255, message="Password must be between 8-255 characters")
-	private String password;	
-	
-	@Transient
-	private String confirm;
-
-
 	
 	public long getId() {
 		return id;
@@ -69,6 +58,42 @@ public class User{
 	}
 	public Date getCreatedAt() {
 		return createdAt;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public boolean isAdmin() {
+		return admin;
+	}
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getConfirm() {
+		return confirm;
+	}
+	public void setConfirm(String confirm) {
+		this.confirm = confirm;
 	}
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
@@ -80,57 +105,10 @@ public class User{
 		this.updatedAt = updatedAt;
 	}
 	
-	// Setters and Getters go here
+	//constructor
 	
 	public User(){
 		this.createdAt = new Date();
 		this.updatedAt = new Date();
 	}
-
-	public void setEmail() {
-		this.email=email;
-	}
-
-	public void setFirstName() {
-		this.firstName=firstName;
-	}
-
-	public void setLastName() {
-		this.lastName=lastName;
-	}
-
-	public void password() {
-		this.password=password;
-	}
-	public void confirm() {
-		this.confirm=confirm;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	
-	public String getLastName() {
-		return lastName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getConfirm() {
-		return confirm;
-	}
-
-	private void setAdmin() {
-		this.admin=admin;
-	}
-
-	public boolean getAdmin() {
-		return admin;
-	} 
-
 }
