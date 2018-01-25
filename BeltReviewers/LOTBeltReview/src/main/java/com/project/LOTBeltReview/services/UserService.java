@@ -1,4 +1,4 @@
-package com.project.events.services;
+package com.project.LOTBeltReview.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,17 +6,23 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.project.events.models.User;
-import com.project.events.repositories.UserRepository;
+import com.project.LOTBeltReview.models.User;
+import com.project.LOTBeltReview.models.Ring;
+
+import com.project.LOTBeltReview.repositories.UserRepository;
+import com.project.LOTBeltReview.repositories.RingRepository;
+
 
 @Service
 public class UserService {
 
 	private UserRepository _ur;
+	private RingRepository _rr;
 	private BCryptPasswordEncoder _bcrypt;
 		
-	public UserService(UserRepository _ur){
+	public UserService(UserRepository _ur, RingRepository _rr){
 		this._ur = _ur;
+		this._rr = _rr;
 		this._bcrypt = new BCryptPasswordEncoder();
 	}
 
@@ -32,24 +38,15 @@ public class UserService {
 		user.setPassword( _bcrypt.encode(user.getPassword()));
 		_ur.save(user);
 	}
+	
+	public void addRing(Long userId, Long ringId) {
+		Ring ring = _rr.findOne(userId);
+		User user = _ur.findOne(ringId);
 
-	public ArrayList<User> getAllUsers() {
-		return (ArrayList<User>) _ur.findAll();
+		List<Ring> rings = user.getRings();
+		rings.add(ring);
+		user.setRings(rings);
+		_ur.save(user);
 	}
 
-	public User findUserById(Long id) {
-		return (User) _ur.findOne(id);
-	}
-
-	public User findUserByEmail(String email) {
-		return (User) _ur.findByEmail(email);
-	}
-
-	public void updateUser(User user) {
-		createUser(user);
-	}
-
-	public void destroy(User user) {
-		_ur.delete(user);
-	}
 }
